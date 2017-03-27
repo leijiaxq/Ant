@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:fitsSystemWindows="true"
+              android:orientation="vertical">
+
+    <include layout="@layout/title"/>
+
+    <EditText
+        android:inputType="phone"
+        android:id="@+id/phone_et"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="100dp"
+        android:hint="请输入手机号码"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"/>
+
+
+    <EditText
+        android:inputType="textPassword"
+        android:id="@+id/password_et"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:layout_marginTop="10dp"
+        android:hint="请输入密码"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"/>
+
+
+    <TextView
+        android:id="@+id/sign_in_tv"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_gravity="center"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/ripple_item_orange_bg"
+        android:gravity="center"
+        android:text="登录"
+        android:textColor="@color/white"
+        android:textSize="18sp"/>
+
+
+    <TextView
+        android:id="@+id/sign_up_tv"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/ripple_item_white_bg"
+        android:clickable="true"
+        android:gravity="center_vertical"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:text="我要注册"
+        android:textColor="@color/ant_theme"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginLeft="10dp"
+        android:background="@color/colorLineItem"/>
+
+
+    <TextView
+        android:id="@+id/miss_password_tv"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/ripple_item_white_bg"
+        android:clickable="true"
+        android:gravity="center_vertical"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        android:text="忘记密码"
+        android:textColor="@color/ant_theme"/>
+
+
+</LinearLayout>

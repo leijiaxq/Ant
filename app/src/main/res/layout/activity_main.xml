@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.vooda.ant.ui.activity.MainActivity"
+    >
+
+    <FrameLayout
+        android:id="@+id/main_fl_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/main_view"
+        android:background="@color/main_gray"
+        />
+
+    <View
+        android:id="@+id/main_view"
+        style="@style/line_view"
+        android:layout_above="@+id/main_rg"
+        />
+
+    <RadioGroup
+        android:id="@+id/main_rg"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerVertical="true"
+        android:background="@color/white"
+        android:orientation="horizontal"
+        >
+
+        <RadioButton
+            android:id="@+id/home_rb"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:button="@null"
+            android:checked="true"
+            android:drawableTop="@drawable/selector_home"
+            android:gravity="center"
+            android:paddingTop="15dp"
+            />
+
+        <RadioButton
+            android:id="@+id/order_rb"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:button="@null"
+            android:drawableTop="@drawable/selector_order"
+            android:gravity="center"
+            android:paddingTop="15dp"
+            />
+
+        <RadioButton
+            android:id="@+id/cart_rb"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:button="@null"
+
+            android:drawableTop="@drawable/selector_cart"
+            android:gravity="center"
+            android:paddingTop="15dp"
+            />
+
+        <RadioButton
+            android:id="@+id/me_rb"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:button="@null"
+            android:drawableTop="@drawable/selector_me"
+            android:gravity="center"
+            android:paddingTop="15dp"
+            />
+    </RadioGroup>
+
+</RelativeLayout>

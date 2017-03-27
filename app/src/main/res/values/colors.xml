@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--<color name="colorPrimary">#3F51B5</color>-->
+    <!--<color name="colorPrimaryDark">#303F9F</color>-->
+    <!--<color name="colorAccent">#FF4081</color> -->
+    <color name="colorPrimary">#EC6000</color>
+    <color name="colorPrimaryDark">#EC6000</color>
+    <color name="colorAccent">#EC6000</color>
+    <color name="blue_theme">#2196F3</color>
+    <color name="white">#FFFFFF</color>
+    <color name="white_press">#D9D9D9</color>
+    <color name="line_gray">#D9D9D9</color>
+    <!--<color name="line_gray">#ddcccccc</color>-->
+    <color name="tran_half">#64888888</color>
+    <color name="text_black">#333333</color>
+    <color name="text_black2">#1e1e1e</color>
+    <color name="text_gray">#999999</color>
+    <color name="text_gray666">#666666</color>
+    <color name="text_blue">#2196f3</color>
+    <color name="text_blue_alf10">#1a2196f3</color>
+    <color name="main_gray">#F7F7F7</color>
+    <color name="translate_gray">#00000000</color>
+
+    <color name="orange_thme">#ffc107</color>
+    <color name="orange_thme_press">#D49108</color>
+    <color name="green_thme">#1cb910</color>
+
+    <color name="black_alf10">#1a000000</color>
+    <color name="pop_text_bg">#e0e0e0</color>
+
+    <color name="blue_theme_press">#1C80CF</color>
+
+
+    <integer-array name="gplus_colors">
+        <item>@color/gplus_color_3</item>
+        <item>@color/gplus_color_1</item>
+        <item>@color/gplus_color_2</item>
+        <item>@color/gplus_color_4</item>
+    </integer-array>
+
+    <color name="gplus_color_1">#3e802f</color>
+    <color name="gplus_color_2">#f4b400</color>
+    <color name="gplus_color_3">#427fed</color>
+    <color name="gplus_color_4">#b23424</color>
+    <color name="gplus_color_4_nor">#D32B36</color>
+
+
+    <color name="text_red">#D32B36</color>
+    <color name="text_red2">#aa0408</color>
+
+
+    <color name="ant_theme">#EC6000</color>
+    <color name="ant_theme_press">#ddEC6000</color>
+    <color name="ant_theme_press_water">#b23424</color>
+
+    <!--水波纹颜色-->
+    <color name="itemBackground">#d9d9d9</color>
+    <!--item的5.0一下版本选择器颜色-->
+    <color name="itemLowBackground">#d9d9d9</color>
+
+    <!--item的分割线-->
+    <color name="colorLineItem">#FFDDDDDD</color>
+
+</resources>
