@@ -31,12 +31,17 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RetrofitHelper {
 
     public static final String TAG = RetrofitHelper.class.getSimpleName();
-    private final static int    CACHE_SIZE = 10 * 1024 * 1024; // 10 MiB
+    private final static int CACHE_SIZE = 10 * 1024 * 1024; // 10 MiB
     public static RetrofitHelper mRetrofitHelper;
 
     public static BaseService getBaseApi() {
         return createApi(BaseService.class, Constants.BASE_URL);
     }
+
+    public static CartService getCartApi() {
+        return createApi(CartService.class, Constants.BASE_URL);
+    }
+
     public static MeService getMeService() {
         return createApi(MeService.class, Constants.BASE_URL);
     }
@@ -59,7 +64,7 @@ public class RetrofitHelper {
     /**
      * 根据传入的baseUrl，和api创建retrofit
      */
-    private static  <T> T createApi(Class<T> clazz, String baseUrl) {
+    private static <T> T createApi(Class<T> clazz, String baseUrl) {
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)

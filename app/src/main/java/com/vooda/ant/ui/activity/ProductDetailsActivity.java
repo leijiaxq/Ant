@@ -23,9 +23,12 @@ import android.widget.TextView;
 import com.vooda.ant.R;
 import com.vooda.ant.api.Constants;
 import com.vooda.ant.api.RetrofitHelper;
+import com.vooda.ant.api.RxBus;
 import com.vooda.ant.base.BaseApplication;
 import com.vooda.ant.base.RxBaseActivity;
 import com.vooda.ant.bean.BaseBean;
+import com.vooda.ant.bean.CartAddBean;
+import com.vooda.ant.bean.CartBean;
 import com.vooda.ant.bean.ColletAddBean;
 import com.vooda.ant.bean.ColletDeleteBean;
 import com.vooda.ant.bean.ColletJudeBean;
@@ -36,7 +39,6 @@ import com.vooda.ant.ui.adapter.CommentAdapter;
 import com.vooda.ant.utils.AddCartAnimUtil;
 import com.vooda.ant.utils.DataFormatUtil;
 import com.vooda.ant.utils.ImageUtil;
-import com.vooda.ant.utils.LogUtil;
 import com.vooda.ant.utils.ScreenUtil;
 import com.vooda.ant.utils.ToastUtil;
 import com.youth.banner.Banner;
@@ -118,6 +120,11 @@ public class ProductDetailsActivity extends RxBaseActivity {
     //商品是否收藏，true,已收藏，false,未收藏
     private boolean mIsCollet = false;
 
+    private List<CartBean.DataBean> mCartDatas = new ArrayList<>();
+
+
+    private int mCartCount = 0;
+
     @Override
     public int getLayoutId() {
         return R.layout.activity_product_details;
@@ -173,6 +180,23 @@ public class ProductDetailsActivity extends RxBaseActivity {
         mAdapter.setOnItemClickListener(new CommentAdapter.OnItemClickListener() {
             @Override
             public void onItemAddClick(View view, int position) {
+
+                if (mBean !=null) {
+                    if (mBean.StockCount > 0) {
+                        mBean.StockCount--;
+
+                        //加入购物车
+                        getAddCart();
+                    } else {
+                        ToastUtil.showShort(ProductDetailsActivity.this, "库存不足");
+                        return;
+                    }
+                } else {
+                    ToastUtil.showShort(ProductDetailsActivity.this, "数据错误");
+                    return;
+
+                }
+
                 // 一个整型数组，用来存储按钮的在屏幕的X、Y坐标
                 int[] start_location = new int[2];
                 // 这是获取购买按钮的在屏幕的X、Y坐标（这也是动画开始的坐标）
@@ -189,7 +213,8 @@ public class ProductDetailsActivity extends RxBaseActivity {
 
                     @Override
                     public void onAnimEnd() {
-
+                        mCartCount++;
+                        mMarketCartTv.setText(mCartCount + "");
                     }
                 });
             }
@@ -242,10 +267,18 @@ public class ProductDetailsActivity extends RxBaseActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            finish();
+            onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        RxBus.getDefault().post(new ProductBean.DataEntity());
+
+        super.onBackPressed();
     }
 
     @Override
@@ -282,6 +315,8 @@ public class ProductDetailsActivity extends RxBaseActivity {
                 judeProductIsCollet();
             }
         }
+
+        getCartListDataNet();
 
     }
 
@@ -391,7 +426,30 @@ public class ProductDetailsActivity extends RxBaseActivity {
             setAddColletBeanData((ColletAddBean) bean);
         } else if (bean instanceof ColletDeleteBean) {
             setDeleteBeanData((ColletDeleteBean) bean);
+        }else if (bean instanceof CartBean) {
+            setCartListData((CartBean) bean);
         }
+    }
+
+    //设置购物车的数据列表
+    private void setCartListData(CartBean bean) {
+        if (bean.data == null) {
+            bean.data = new ArrayList<>();
+        }
+        mCartDatas.clear();
+        mCartDatas.addAll(bean.data);
+
+        int size = 0;
+        for (int i = 0, length = mCartDatas.size(); i < length; i++) {
+            CartBean.DataBean bean2 = mCartDatas.get(i);
+            size += bean2.BuyNum;
+        }
+        if (size > 0) {
+            mMarketCartTv.setVisibility(View.VISIBLE);
+            mMarketCartTv.setText(size + "");
+        }
+        mCartCount = size;
+
     }
 
     //取消商品收藏
@@ -467,6 +525,23 @@ public class ProductDetailsActivity extends RxBaseActivity {
 
     @OnClick(R.id.item_add_iv)
     public void clickAdd(View view) {
+        if (mBean !=null) {
+            if (mBean.StockCount > 0) {
+                mBean.StockCount--;
+
+                //加入购物车
+                getAddCart();
+            } else {
+                ToastUtil.showShort(ProductDetailsActivity.this, "库存不足");
+                return;
+            }
+        } else {
+            ToastUtil.showShort(ProductDetailsActivity.this, "数据错误");
+            return;
+
+        }
+
+
         // 一个整型数组，用来存储按钮的在屏幕的X、Y坐标
         int[] start_location = new int[2];
         // 这是获取购买按钮的在屏幕的X、Y坐标（这也是动画开始的坐标）
@@ -478,13 +553,12 @@ public class ProductDetailsActivity extends RxBaseActivity {
         AddCartAnimUtil.getInstance().setAddCartListener(new AddCartAnimUtil.AddCartListener() {
             @Override
             public void onAnimStart() {
-                LogUtil.d("Cart", "Start");
             }
 
             @Override
             public void onAnimEnd() {
-                LogUtil.d("Cart", "End");
-
+                mCartCount++;
+                mMarketCartTv.setText(mCartCount + "");
             }
         });
     }
@@ -629,6 +703,74 @@ public class ProductDetailsActivity extends RxBaseActivity {
                 });
     }
 
+    private void getCartListDataNet() {
+
+        if (BaseApplication.mUserInfoBean != null && BaseApplication.mUserInfoBean.UserID != 0) {
+            RetrofitHelper.getCartApi()
+                    .getCartListNet(BaseApplication.mUserInfoBean.UserID)
+                    .compose(this.<CartBean>bindToLifecycle())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Subscriber<CartBean>() {
+                        @Override
+                        public void onCompleted() {
+
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            showNetError();
+                        }
+
+                        @Override
+                        public void onNext(CartBean cartBean) {
+                            if (Constants.OK.endsWith(cartBean.result)) {
+                                finishTask(cartBean);
+                            } else {
+                                ToastUtil.showShort(ProductDetailsActivity.this, TextUtils.isEmpty(cartBean.message) ? "" : cartBean.message);
+                            }
+                        }
+                    });
+        }
+    }
+
+    private void getAddCart() {
+
+        if (BaseApplication.mUserInfoBean != null && BaseApplication.mUserInfoBean.UserID != 0) {
+            if (mBean !=null) {
+                RetrofitHelper.getBaseApi().getAddShopCartNet(mBean.ProID, BaseApplication.mUserInfoBean.UserID, 1)
+                        .compose(this.<CartAddBean>bindToLifecycle())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Subscriber<CartAddBean>() {
+                            @Override
+                            public void onCompleted() {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                showNetError();
+                            }
+
+                            @Override
+                            public void onNext(CartAddBean cartAddBean) {
+                                if (Constants.OK.endsWith(cartAddBean.result)) {
+                                    finishTask(cartAddBean);
+                                } else {
+                                    ToastUtil.showShort(ProductDetailsActivity.this, TextUtils.isEmpty(cartAddBean.message) ? "" : cartAddBean.message);
+                                }
+                            }
+                        });
+
+            } else {
+                ToastUtil.showShort(ProductDetailsActivity.this, "数据有误");
+
+            }
+        } else {
+            ToastUtil.showShort(ProductDetailsActivity.this, "请先登录");
+        }
+    }
 
 }
 

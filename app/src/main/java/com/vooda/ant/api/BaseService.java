@@ -1,6 +1,7 @@
 package com.vooda.ant.api;
 
 
+import com.vooda.ant.bean.CartAddBean;
 import com.vooda.ant.bean.ColletAddBean;
 import com.vooda.ant.bean.ColletDeleteBean;
 import com.vooda.ant.bean.ColletJudeBean;
@@ -70,12 +71,18 @@ public interface BaseService {
 
     //    删除商品收藏
     @FormUrlEncoded
-    @POST("/mall/DeleteCollectData")
+    @POST("mall/DeleteCollectData")
     Observable<ColletDeleteBean> getDeleteCollectDataNet(@Field("ProID") int ProID, @Field("UserID") int UserID, @Field("Type") int Type, @Field("CollectID") String CollectID);
 
     //    判断商品是否已收藏
     @FormUrlEncoded
-    @POST("/mall/IsCollect")
+    @POST("mall/IsCollect")
     Observable<ColletJudeBean> JudeCollectDataNet(@Field("ProID") int ProID, @Field("UserID") int UserID);
+
+    //    添加商品到购物车
+    @FormUrlEncoded
+    @POST("mall/AddShopCart")
+    Observable<CartAddBean> getAddShopCartNet(@Field("ProID") int ProID, @Field("UserID") int UserID, @Field("Count") int Count);
+
 
 }

@@ -16,8 +16,12 @@ import android.widget.TextView;
 import com.vooda.ant.R;
 import com.vooda.ant.api.Constants;
 import com.vooda.ant.api.RetrofitHelper;
+import com.vooda.ant.api.RxBus;
+import com.vooda.ant.base.BaseApplication;
 import com.vooda.ant.base.RxLazyFragment;
 import com.vooda.ant.bean.BaseBean;
+import com.vooda.ant.bean.CartAddBean;
+import com.vooda.ant.bean.CartBean;
 import com.vooda.ant.bean.ProductBean;
 import com.vooda.ant.ui.activity.MarketActivity;
 import com.vooda.ant.ui.activity.ProductDetailsActivity;
@@ -33,6 +37,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -42,27 +47,32 @@ import rx.schedulers.Schedulers;
  */
 public class PriceFragment extends RxLazyFragment implements SwipeRefreshLayout.OnRefreshListener {
     @BindView(R.id.market_cart_iv)
-    ImageView            mMarketCartIv;
+    ImageView mMarketCartIv;
     @BindView(R.id.market_cart_tv)
-    TextView             mMarketCartTv;
+    TextView mMarketCartTv;
     @BindView(R.id.market_total_tv)
-    TextView             mMarketTotalTv;
+    TextView mMarketTotalTv;
     @BindView(R.id.market_settle_btn)
-    Button               mMarketSettleBtn;
+    Button mMarketSettleBtn;
     @BindView(R.id.recycler_view)
-    RecyclerView         mRecyclerView;
+    RecyclerView mRecyclerView;
     @BindView(R.id.swip_refresh)
-    SwipeRefreshLayout   mSwipRefresh;
+    SwipeRefreshLayout mSwipRefresh;
     @BindView(R.id.fab)
     FloatingActionButton mFab;
 
 
     private List<ProductBean.DataEntity> mDatas = new ArrayList<>();
+    private List<CartBean.DataBean> mCartDatas = new ArrayList<>();
 
-    private int            mMarketKey;
+    private int mMarketKey;
     private ProductAdapter mAdapter;
 
     MarketActivity mMarketActivity;
+
+    private int mCartCount = 0;
+
+    private int mPosition = 0;
 
 
     @Override
@@ -119,7 +129,26 @@ public class PriceFragment extends RxLazyFragment implements SwipeRefreshLayout.
             //加入购物车
             @Override
             public void onItemAddClick(View view, int position) {
-                ToastUtil.showShort(mActivity, "加入购物车");
+//                ToastUtil.showShort(mActivity, "加入购物车");
+                mPosition = position;
+
+                if (mDatas.size() > position) {
+                    ProductBean.DataEntity bean = mDatas.get(position);
+                    if (bean.StockCount > 0) {
+                        bean.StockCount--;
+
+                        //加入购物车
+                        getAddCart(position);
+                    } else {
+                        ToastUtil.showShort(mActivity, "库存不足");
+                        return;
+                    }
+                } else {
+                    ToastUtil.showShort(mActivity, "数据错误");
+                    return;
+
+                }
+
 
                 // 一个整型数组，用来存储按钮的在屏幕的X、Y坐标
                 int[] start_location = new int[2];
@@ -132,12 +161,12 @@ public class PriceFragment extends RxLazyFragment implements SwipeRefreshLayout.
                 AddCartAnimUtil.getInstance().setAddCartListener(new AddCartAnimUtil.AddCartListener() {
                     @Override
                     public void onAnimStart() {
-
                     }
 
                     @Override
                     public void onAnimEnd() {
-
+                        mCartCount++;
+                        mMarketCartTv.setText(mCartCount + "");
                     }
                 });
 
@@ -159,7 +188,24 @@ public class PriceFragment extends RxLazyFragment implements SwipeRefreshLayout.
     public void loadData() {
         mMarketKey = ((MarketActivity) getActivity()).getMarketKey();
         getProductListNet();
+
+        getCartListDataNet();
+
+
+        //用于--从商品详情页返回市场时 ,从新获取购物车列表数据
+        RxBus.getDefault().toObservable(ProductBean.DataEntity.class)
+                .compose(this.<ProductBean.DataEntity>bindToLifecycle())
+                .subscribe(new Action1<ProductBean.DataEntity>() {
+                    @Override
+                    public void call(ProductBean.DataEntity dataEntity) {
+                        getCartListDataNet();
+                    }
+                });
+
     }
+
+
+
 
     //获取商品列表数据
     private void getProductListNet() {
@@ -194,6 +240,77 @@ public class PriceFragment extends RxLazyFragment implements SwipeRefreshLayout.
 
     }
 
+    private void getAddCart(int position) {
+
+        if (BaseApplication.mUserInfoBean != null && BaseApplication.mUserInfoBean.UserID != 0) {
+            if (mDatas.size() > position) {
+                ProductBean.DataEntity bean = mDatas.get(position);
+                RetrofitHelper.getBaseApi().getAddShopCartNet(bean.ProID, BaseApplication.mUserInfoBean.UserID, 1)
+                        .compose(this.<CartAddBean>bindToLifecycle())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Subscriber<CartAddBean>() {
+                            @Override
+                            public void onCompleted() {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                showNetError();
+                            }
+
+                            @Override
+                            public void onNext(CartAddBean cartAddBean) {
+                                if (Constants.OK.endsWith(cartAddBean.result)) {
+                                    finishTask(cartAddBean);
+                                } else {
+                                    ToastUtil.showShort(mActivity, TextUtils.isEmpty(cartAddBean.message) ? "" : cartAddBean.message);
+                                }
+                            }
+                        });
+
+            } else {
+                ToastUtil.showShort(mActivity, "数据有误");
+
+            }
+        } else {
+            ToastUtil.showShort(mActivity, "请先登录");
+        }
+    }
+
+
+    private void getCartListDataNet() {
+
+        if (BaseApplication.mUserInfoBean != null && BaseApplication.mUserInfoBean.UserID != 0) {
+            RetrofitHelper.getCartApi()
+                    .getCartListNet(BaseApplication.mUserInfoBean.UserID)
+                    .compose(this.<CartBean>bindToLifecycle())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Subscriber<CartBean>() {
+                        @Override
+                        public void onCompleted() {
+
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            showNetError();
+                        }
+
+                        @Override
+                        public void onNext(CartBean cartBean) {
+                            if (Constants.OK.endsWith(cartBean.result)) {
+                                finishTask(cartBean);
+                            } else {
+                                ToastUtil.showShort(mActivity, TextUtils.isEmpty(cartBean.message) ? "" : cartBean.message);
+                            }
+                        }
+                    });
+        }
+    }
+
     @Override
     public void onRefresh() {
         mMarketActivity.mRefresh = true;
@@ -216,7 +333,30 @@ public class PriceFragment extends RxLazyFragment implements SwipeRefreshLayout.
         super.finishTask(bean);
         if (bean instanceof ProductBean) {
             setProductListData((ProductBean) bean);
+        } else if (bean instanceof CartBean) {
+            setCartListData((CartBean) bean);
         }
+    }
+
+    //设置购物车的数据列表
+    private void setCartListData(CartBean bean) {
+        if (bean.data == null) {
+            bean.data = new ArrayList<>();
+        }
+        mCartDatas.clear();
+        mCartDatas.addAll(bean.data);
+
+        int size = 0;
+        for (int i = 0, length = mCartDatas.size(); i < length; i++) {
+            CartBean.DataBean bean2 = mCartDatas.get(i);
+            size += bean2.BuyNum;
+        }
+        if (size > 0) {
+            mMarketCartTv.setVisibility(View.VISIBLE);
+            mMarketCartTv.setText(size + "");
+        }
+        mCartCount = size;
+
     }
 
     //设置商品列表数据
