@@ -41,6 +41,7 @@ public class OrderFragment extends RxLazyFragment {
     @BindView(R.id.order_vp)
     ViewPager mOrderVp;
 
+
     AppCompatActivity mAppCompatActivity;
 
     private List<String> mTitles = new ArrayList<>();
@@ -54,6 +55,8 @@ public class OrderFragment extends RxLazyFragment {
     @Override
     public void initView(Bundle state) {
         mTitleTv.setText("我的订单");
+
+
         setHasOptionsMenu(true);
         mAppCompatActivity = (AppCompatActivity) mActivity;
         mAppCompatActivity.setSupportActionBar(mToolbar);

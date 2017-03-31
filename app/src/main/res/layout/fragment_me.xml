@@ -73,15 +73,35 @@
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="79dp"
+                android:layout_height="?attr/actionBarSize"
+                android:paddingTop="@dimen/padding_top"
                 app:layout_collapseMode="pin"
-                >
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="23.5dp"
-                    android:src="@drawable/back_white_img"/>
+                >
+                <RelativeLayout
+                    android:layout_marginRight="16dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                   <ImageView
+                         android:id="@+id/left_icon_iv"
+                         android:layout_width="wrap_content"
+                         android:layout_height="match_parent"
+                         android:src="@drawable/back_white_img"/>
+                    <TextView
+                        android:layout_centerInParent="true"
+                        android:text="sdfsdfsd"
+                        android:textColor="@color/white"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                    <ImageView
+
+                        android:layout_alignParentRight="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/back_white_img"/>
+                </RelativeLayout>
+
             </android.support.v7.widget.Toolbar>
         </android.support.design.widget.CollapsingToolbarLayout>
 

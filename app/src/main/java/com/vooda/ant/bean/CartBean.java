@@ -7,7 +7,7 @@ import java.util.List;
  * Date        2017/3/27 14:39
  * Describe
  */
-public class CartBean extends BaseBean{
+public class CartBean extends BaseBean {
 
 
     /**
@@ -50,5 +50,8 @@ public class CartBean extends BaseBean{
         public String ImageUrl;
         public String UnitName;
         public int PCType;
+
+        //选择框是否选中
+        public boolean mIsSelected = false;
     }
 }

@@ -2,6 +2,7 @@ package com.vooda.ant.base;
 
 import android.app.Application;
 
+import com.tencent.bugly.crashreport.CrashReport;
 import com.vooda.ant.bean.UserBean;
 
 /**
@@ -22,6 +23,7 @@ public class BaseApplication extends Application {
     public void onCreate() {
         super.onCreate();
         mInstance = this;
+        CrashReport.initCrashReport(getApplicationContext(), "629df3ca5c", false);
     }
 
     public static BaseApplication getInstance() {
